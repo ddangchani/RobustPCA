@@ -3,7 +3,7 @@
 import numpy as np
 from src.threshold import threshold
 
-def orthographic_retraction(L, Y, r, gamma, eta, sparsity):
+def orthographic_retraction(L, Y, r, gamma, eta):
     """
     Orthographic retraction
     L: Current estimate of low-rank component
@@ -14,14 +14,14 @@ def orthographic_retraction(L, Y, r, gamma, eta, sparsity):
     sparsity: Sparsity parameter
     """
     
-    gradient = threshold(L-Y, gamma, sparsity)
+    gradient = threshold(L-Y, gamma)
 
     Q = L[:, np.random.choice(L.shape[1], r, replace=False)] # Randomly choose r columns of L
     R = L[np.random.choice(L.shape[0], r, replace=False), :] # Randomly choose r rows of L
 
     # Gradient Descent
     L_tmp = L - eta * gradient
-    QtL_tmp = Q.T @ L_tmp
-    L_out = np.dot(L_tmp, R) @ np.linalg.inv(np.dot(QtL_tmp, R)) @ QtL_tmp
+    QtL_tmp = np.dot(Q.T, L_tmp)
+    L_out = np.dot(L_tmp, R.T) @ np.linalg.inv(np.dot(QtL_tmp, R.T)) @ QtL_tmp
 
     return L_out, gradient
